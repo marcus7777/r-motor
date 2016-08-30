@@ -1,0 +1,13 @@
+{
+  "name": "r-motor",
+  "version": "1.0.0",
+  "description": "simple motor",
+  "main": "r-motor.html",
+  "keywords": [
+    "polymer",
+    "web-components"
+  ],
+  "dependencies": {
+    "polymer": "*"
+  }
+}

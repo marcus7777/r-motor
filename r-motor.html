@@ -1,50 +1,39 @@
-<!doctype html>
-<meta charset='utf-8'>
-<html>
-  <head>
-    <base href="https://open-elements.org/bower_components/new/">
-    <title>r-motor demo</title>
-    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-    <script>window.onerror = function (errorMsg, url, line) {document.write('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + line)}</script>
-  </head>
-  <body>
-    <h3>r-motor Demo</h3>
-    <r-motor  shade="1 2 3 4 5 6 7 8 "></r-motor>
-  </body>
-</html><link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 <!--
-  `<r-motor></r-motor>` undefined
+  `<r-motor></r-motor>` simple motor
   @demo demo.html
 -->
 <dom-module id="r-motor">
   <template>
-    <style>:host {display:inline-block;}
-    #rotate {
-      transition: transform 30s linear;
-    }
-    #rotate:hover {
-      transform: rotate(360deg);
-    }
+    <style>
+      :host {
+        display:inline-block;
+      }
+      #rotate {
+        transition: transform 30s linear;
+      }
+      :hover #rotate {
+        transform: rotate(360deg);
+      }
     </style>
-    
-    <svg style="width:700px;height:400px;">
-      <g>
-        <circle cx$="{{ledx(1,6,8,cx,cr,gap)}}" cy$="{{ledy(1,6,8,cy,cr,gap)}}" r="3"/>
-        <circle cx$="{{ledx(2,6,8,cx,cr,gap)}}" cy$="{{ledy(2,6,8,cy,cr,gap)}}" r="3"/>
-        <circle cx$="{{ledx(3,6,8,cx,cr,gap)}}" cy$="{{ledy(3,6,8,cy,cr,gap)}}" r="3"/>
-        <circle cx$="{{ledx(4,6,8,cx,cr,gap)}}" cy$="{{ledy(4,6,8,cy,cr,gap)}}" r="3"/>
-        <circle cx$="{{ledx(5,6,8,cx,cr,gap)}}" cy$="{{ledy(5,6,8,cy,cr,gap)}}" r="3"/>
-        <circle cx$="{{ledx(6,6,8,cx,cr,gap)}}" cy$="{{ledy(6,6,8,cy,cr,gap)}}" r="3"/>
-      </g>
+    <template is="dom-repeat" items='[1,2,3,4,5,6]'>
+      <svg style="width:300px;height:300px;position: absolute; z-index: -1">
+        <g>
+          <circle cx$="{{ledx(item,6,8,cx,cr,gap)}}" cy$="{{ledy(item,6,8,cy,cr,gap)}}" r="3"/>
+        </g>
+        <line x1$="{{ledx(item,6,8,cx,cr,gap)}}" y1$="{{ledy(item,6,8,cy,cr,gap)}}" x2="320" y2$="{{cy}}" style="stroke:#000;stroke-width:1;transform:translateY(2px)" />
+        <line x1$="{{ledx(item,6,8,cx,cr,gap)}}" y1$="{{ledy(item,6,8,cy,cr,gap)}}" x2="320" y2$="{{cy}}" style="stroke:#000;stroke-width:1;transform:translateY(-2px)" />
+      </svg>
+    </template>
+    <svg style="width:300px;height:300px;">
       <g id="rotate" title="rotates with motor" style="transform-origin:{{cx}}px {{cy}}px;">
         <polygon points$="{{shadePoints}}" style="fill:#c33;"/>
         <polygon points$="{{shadePoints}}" style="fill:#3c3;transform:rotate({{offSet}});transform-origin:{{cx}}px {{cy}}px;"/>
-        <circle title="motor" cx$="{{cx}}" cy$="{{cy}}" r="45" style="fill:gold"/>
-        <circle cx$="{{cx}}" cy$="{{cy}}" r="5" style="fill:gray"/>
+        <circle title="motor" cx$="{{cx}}" cy$="{{cy}}" r="85" style="fill:gold"/>
+        <circle cx$="{{cx}}" cy$="{{cy}}" r="27" style="fill:gold" stroke="red" stroke-width="1" stroke-opacity=".5"/>
+        <circle cx$="{{cx}}" cy$="{{cy}}" r="7" style="fill:gray"/>
       </g> 
-    
     </svg>
-    
   </template>
 </dom-module>
 <script>
@@ -53,7 +42,7 @@
     properties:{
       gap:{
         type:Number,
-        value:15,
+        value:20,
       },
       shade:{
         type:String,
@@ -61,42 +50,45 @@
       },
       offSet:{
         type:String,
-        value:"17deg",
+        value:"10deg",
       },
       cx:{
         type:Number,
-        value:80,
+        value:150,
       },
       cy:{
         type:Number,
-        value:80,
+        value:150,
       },
       cr:{
         type:Number,
-        value:70,
+        value:130,
       },
     },
     ready: function(undefined){
-      var x,y,x2,y2
       var cx = this.cx
       var cy = this.cy
       var cr = this.cr
       var cir = cr - this.gap
       
-      var shadePoints = this.shade.split(").map(function (val, index, array) {
-      
+      var shadePoints = this.shade.split("").map(function (val, ix, arr) {
+        var pi2 = 2*Math.PI
         if (val == " ") {
-          x = cx + (Math.cos((2*Math.PI) * (index/array.length)) * cr)
-          y = cy + (Math.sin((2*Math.PI) * (index/array.length)) * cr)
-          x2 = cx + (Math.cos((2*Math.PI) * (index/array.length)) * cir)
-          y2 = cy + (Math.sin((2*Math.PI) * (index/array.length)) * cir)
+          return +(cx + (Math.cos(pi2 * (ix/arr.length)) * cr)) 
+          +","+ +(cy + (Math.sin(pi2 * (ix/arr.length)) * cr))
+          +" "+ +(cx + (Math.cos(pi2 * (ix/arr.length)) * cir))
+          +","+ +(cy + (Math.sin(pi2 * (ix/arr.length)) * cir))
+          +" "+ +(cx + (Math.cos(pi2 * ((ix + .5)/arr.length)) * cir))
+          +","+ +(cy + (Math.sin(pi2 * ((ix + .5)/arr.length)) * cir))
+      
         } else { 
-          x = cx + (Math.cos((2*Math.PI) * (index/array.length)) * cir)
-          y = cy + (Math.sin((2*Math.PI) * (index/array.length)) * cir) 
-          x2 = cx + (Math.cos((2*Math.PI) * (index/array.length)) * cr)
-          y2 = cy + (Math.sin((2*Math.PI) * (index/array.length)) * cr)
+          return +(cx + (Math.cos(pi2 * (ix/arr.length)) * cir)) 
+          +","+ +(cy + (Math.sin(pi2 * (ix/arr.length)) * cir))
+          +" "+ +(cx + (Math.cos(pi2 * (ix/arr.length)) * cr))
+          +","+ +(cy + (Math.sin(pi2 * (ix/arr.length)) * cr))
+          +" "+ +(cx + (Math.cos(pi2 * ((ix + .5)/arr.length)) * cr))
+          +","+ +(cy + (Math.sin(pi2 * ((ix + .5)/arr.length)) * cr))
         }
-        return x+","+y+" "+x2+","+y2
       })
       this.shadePoints = shadePoints.join(" ")
        
